@@ -1,0 +1,1 @@
+All experiments are first run on the respective dataset .py file, and then ran on calculations.py (ex. run 5k5k.py first, then run calculations.py on the variables from 5k5k.py)
