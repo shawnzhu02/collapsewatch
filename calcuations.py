@@ -20,7 +20,6 @@ plt.style.use('default')
 sns.set_palette("husl")
 
 def compute_mmd(X, Y, gamma=1.0):
-    """Compute Maximum Mean Discrepancy using RBF kernel"""
     XX = rbf_kernel(X, X, gamma=gamma)
     YY = rbf_kernel(Y, Y, gamma=gamma)
     XY = rbf_kernel(X, Y, gamma=gamma)
@@ -28,10 +27,6 @@ def compute_mmd(X, Y, gamma=1.0):
     return np.sqrt(max(mmd_squared, 0))
 
 def compute_wasserstein2(X, Y, sample_size=1000):
-    """
-    Compute Wasserstein-2 distance between two distributions
-    Uses PCA for dimensionality reduction and sampling for efficiency
-    """
     if len(X) > sample_size:
         idx_X = np.random.choice(len(X), sample_size, replace=False)
         X = X[idx_X]
@@ -64,10 +59,6 @@ def compute_wasserstein2(X, Y, sample_size=1000):
     return np.sqrt(wasserstein2)
 
 def compute_ks_multivariate(X, Y, num_projections=100):
-    """
-    Compute multivariate KS test using random projections
-    Projects high-dimensional data onto random 1D directions
-    """
     np.random.seed(seed)  
 
     scaler = StandardScaler()
@@ -96,7 +87,6 @@ def compute_ks_multivariate(X, Y, num_projections=100):
     return avg_ks_stat, avg_p_value
 
 def bootstrap_mmd(X_real, X_synth, num_bootstrap=1000, sample_limit=3000):
-    """Bootstrap MMD test with null hypothesis testing"""
     np.random.seed(seed)
 
     if sample_limit and len(X_real) > sample_limit:
@@ -129,13 +119,10 @@ def bootstrap_mmd(X_real, X_synth, num_bootstrap=1000, sample_limit=3000):
     return observed_mmd, p_val, bootstrap_stats
 
 def plot_distribution_comparison(X_real, X_synth, feature_name, save_plots=False):
-    """
-    Create comprehensive visualization of distribution differences
-    """
     fig, axes = plt.subplots(2, 3, figsize=(18, 12))
     fig.suptitle(f'Distribution Comparison: {feature_name} Features', fontsize=16, fontweight='bold')
 
-    print(f"    📊 Creating PCA projection...")
+    print(f"Creating PCA projection...")
     pca = PCA(n_components=2)
     X_combined = np.vstack([X_real, X_synth])
     X_combined_pca = pca.fit_transform(X_combined)
@@ -150,7 +137,7 @@ def plot_distribution_comparison(X_real, X_synth, feature_name, save_plots=False
     axes[0, 0].legend()
     axes[0, 0].grid(True, alpha=0.3)
 
-    print(f"    📊 Creating t-SNE projection...")
+    print(f"Creating t-SNE projection...")
     sample_size = min(1000, len(X_real), len(X_synth))
     if len(X_real) > sample_size:
         idx_real = np.random.choice(len(X_real), sample_size, replace=False)
@@ -180,7 +167,7 @@ def plot_distribution_comparison(X_real, X_synth, feature_name, save_plots=False
     axes[0, 1].legend()
     axes[0, 1].grid(True, alpha=0.3)
 
-    print(f"    📊 Creating feature magnitude distribution...")
+    print(f"Creating feature magnitude distribution...")
     real_norms = np.linalg.norm(X_real, axis=1)
     synth_norms = np.linalg.norm(X_synth, axis=1)
 
@@ -192,7 +179,7 @@ def plot_distribution_comparison(X_real, X_synth, feature_name, save_plots=False
     axes[0, 2].legend()
     axes[0, 2].grid(True, alpha=0.3)
 
-    print(f"    📊 Creating top features comparison...")
+    print(f"Creating top features comparison...")
     feature_vars = np.var(X_combined, axis=0)
     top_features = np.argsort(feature_vars)[-10:]
 
@@ -212,7 +199,7 @@ def plot_distribution_comparison(X_real, X_synth, feature_name, save_plots=False
     axes[1, 0].legend()
     axes[1, 0].grid(True, alpha=0.3)
 
-    print(f"    📊 Creating pairwise distance distribution...")
+    print(f"Creating pairwise distance distribution...")
     sample_size_dist = min(500, len(X_real), len(X_synth))
     if len(X_real) > sample_size_dist:
         idx_real = np.random.choice(len(X_real), sample_size_dist, replace=False)
@@ -234,7 +221,7 @@ def plot_distribution_comparison(X_real, X_synth, feature_name, save_plots=False
     axes[1, 1].legend()
     axes[1, 1].grid(True, alpha=0.3)
 
-    print(f"    📊 Creating dimensionality statistics...")
+    print(f"Creating dimensionality statistics...")
     real_stats = np.array([
         np.mean(X_real, axis=1),  
         np.std(X_real, axis=1),  
@@ -276,9 +263,6 @@ def plot_distribution_comparison(X_real, X_synth, feature_name, save_plots=False
     print(f"    Std difference: {abs(X_real.std() - X_synth.std()):.4f}")
 
 def plot_test_results(all_results, save_plots=False):
-    """
-    Create visualization of test results across all feature types
-    """
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
     fig.suptitle('Statistical Test Results Across Feature Types', fontsize=16, fontweight='bold')
 
@@ -364,7 +348,6 @@ def plot_test_results(all_results, save_plots=False):
 
     plt.show()
 def bootstrap_wasserstein2(X_real, X_synth, num_bootstrap=500, sample_limit=1000):
-    """Bootstrap Wasserstein-2 test with null hypothesis testing"""
     np.random.seed(seed)
 
     if sample_limit and len(X_real) > sample_limit:
@@ -396,26 +379,23 @@ def bootstrap_wasserstein2(X_real, X_synth, num_bootstrap=500, sample_limit=1000
 def run_comprehensive_tests(X_real, X_synth, feature_name,
                           mmd_bootstrap=2000, w2_bootstrap=1000,
                           ks_projections=500, sample_limit=2000):
-    """
-    Run all three tests (MMD, Wasserstein-2, KS) on a feature set
-    """
-    print(f"\n🔍 Running comprehensive tests for {feature_name} features...")
+    print(f"\n Running comprehensive tests for {feature_name} features...")
 
     results = {}
 
-    print(f"  📊 MMD Test...")
+    print(f"MMD Test...")
     mmd_val, mmd_p, _ = bootstrap_mmd(X_real, X_synth,
                                     num_bootstrap=mmd_bootstrap,
                                     sample_limit=sample_limit)
     results['MMD'] = {'statistic': mmd_val, 'p_value': mmd_p}
 
-    print(f"  📊 Wasserstein-2 Test...")
+    print(f"Wasserstein-2 Test...")
     w2_val, w2_p, _ = bootstrap_wasserstein2(X_real, X_synth,
                                             num_bootstrap=w2_bootstrap,
                                             sample_limit=sample_limit)
     results['Wasserstein-2'] = {'statistic': w2_val, 'p_value': w2_p}
 
-    print(f"  📊 Kolmogorov-Smirnov Test...")
+    print(f"Kolmogorov-Smirnov Test...")
     ks_stat, ks_p = compute_ks_multivariate(X_real, X_synth,
                                           num_projections=ks_projections)
     results['KS'] = {'statistic': ks_stat, 'p_value': ks_p}
@@ -438,7 +418,7 @@ if __name__ == "__main__":
     plot_test_results(all_results, save_plots=False)
 
     print("\n" + "="*80)
-    print("📊 COMPREHENSIVE DISTRIBUTION TESTING RESULTS")
+    print("COMPREHENSIVE DISTRIBUTION TESTING RESULTS")
     print("="*80)
 
     print(f"\n{'Feature Type':<12} {'Test':<15} {'Statistic':<12} {'P-value':<10} {'Significant':<12}")
@@ -453,7 +433,7 @@ if __name__ == "__main__":
             print(f"{feature_name:<12} {test_name:<15} {stat:<12.4f} {p_val:<10.5f} {significant:<12}")
 
     print("\n" + "="*80)
-    print("📝 INTERPRETATION GUIDE:")
+    print("INTERPRETATION GUIDE:")
     print("="*80)
     print("• Lower p-values (< 0.05) indicate significant differences between distributions")
     print("• Higher statistics generally indicate larger differences between distributions")
